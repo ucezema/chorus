@@ -1,0 +1,57 @@
+library(tidyverse)
+library(haven)
+library(plyr)
+
+
+
+data <- read_sav("data.sav") %>% 
+  select(-c(sign:hh_num, Q3, ID, address:end_time, phone:submission_time))
+hh_spending <- read_sav("hh_spending.sav") %>% 
+  select(prim, hh_item_num, period_hh_exp, amount_purch)
+
+inpatient_costing <- read_sav("inpatient_costing.sav") %>% 
+  select(-two_index)
+  
+inpatient_costing_other <- read_sav("inpatient_costing_other.sav") %>% 
+  select(-three_index)
+  
+inpatient_costingi <- read_sav("inpatient_costingi.sav") %>% 
+  select(-c(four_index, four_parent_index))
+  
+inpatient_costingi_other <- read_sav("inpatient_costingi_other.sav") %>% 
+  select(-five_index)
+
+item2b <- read_sav("item2b.sav") %>% 
+  select(-six_index)
+  
+outpatient_costing <- read_sav("outpatient_costing.sav") %>% 
+  select(-seven_index)
+  
+outpatient_costing_other <- read_sav("outpatient_costing_other.sav")
+visit_num <- read_sav("visit_num.sav")
+visit_numa <- read_sav("visit_numa.sav")
+
+
+list_allT <- list(data, hh_spending, inpatient_costing, inpatient_costing_other,
+                       inpatient_costingi, inpatient_costingi_other, item2b,
+                       outpatient_costing, outpatient_costing_other, visit_num, visit_numa)
+
+all <- list_allT %>% reduce(left_join, by = 'prim')
+  #group_by(prim)
+
+hh_spending
+view(inpatient_costing)
+
+all
+write_sav(all, "Consumer_survey.sav")
+
+glimpse(all)
+view(all)  
+
+?haven
+
+
+allx <- Reduce(function (...) { merge(..., all = TRUE) },   # Full join
+               list(data, hh_sprending, inpatient_costing, inpatient_costing_other,
+                    inpatient_costingi, inpatient_costingi_other, item2b,
+                    outpatient_costing, outpatient_costing_other, visit_num, visit_numa))
